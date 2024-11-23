@@ -1,0 +1,95 @@
+.page-container {
+    background: #000;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    overflow-x: hidden;
+}
+
+.container {
+    position: relative;
+    height: 300vh; /* Total scrollable height for all sections */
+}
+
+.section {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: sticky;
+    top: 0;
+}
+
+.content {
+    text-align: center;
+    padding: 20px;
+    width: 100%;
+    max-width: 1200px;
+    position: relative;
+}
+
+.name-container, .date-container, .message-container {
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.name {
+    font-size: 4vw;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(45deg, #fff, #e0e0e0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+}
+
+.date {
+    font-size: 8vw;
+    font-weight: 800;
+    margin: 20px 0;
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.message {
+    font-size: 1.5vw;
+    color: #888;
+    letter-spacing: 0.1em;
+}
+
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+.particle {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+}
+
+.parallax-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+    opacity: 0.5;
+    transform: scale(1.1);
+}
+
+#intro { z-index: 3; }
+#date { z-index: 2; }
+#message { z-index: 1; }

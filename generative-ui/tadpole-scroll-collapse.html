@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0;
+      background: #000810;
+      min-height: 300vh;
+      position: relative;
+    }
+    .canvas-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    canvas {
+      border: 1px solid #ccc;
+      background: #001828;
+    }
+    .scroll-hint {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255, 200, 100, 0.9);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      opacity: 1;
+      transition: opacity 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <div class="canvas-container">
+    <canvas id="canvas" width="600" height="400"></canvas>
+  </div>
+  <div id="scrollHint" class="scroll-hint">Scroll to control tadpoles</div>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const scrollHint = document.getElementById('scrollHint');
+
+    let scrollProgress = 0;
+    let targetPoint = null;
+    const minTadpoles = 20;
+    const maxTadpoles = 100;
+
+    class Tadpole {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.savedX = x;
+        this.savedY = y;
+        this.vx = (Math.random() - 0.5) * 2;
+        this.vy = (Math.random() - 0.5) * 2;
+        this.points = Array(20).fill().map(() => ({ x, y }));
+        this.angle = 0;
+        this.speed = 0.5;
+        this.turnSpeed = 0.05;
+        this.absorbed = false;
+      }
+
+      update() {
+        if (this.absorbed) return;
+
+        let targetSpeed = 0.5 + (scrollProgress * 1.5);
+        
+        if (targetPoint) {
+          const dx = targetPoint.x - this.x;
+          const dy = targetPoint.y - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist < 10) {
+            this.absorbed = true;
+            return;
+          }
+
+          // Adjust velocity towards target
+          this.vx += (dx / dist) * this.turnSpeed * (1 + scrollProgress * 2);
+          this.vy += (dy / dist) * this.turnSpeed * (1 + scrollProgress * 2);
+        }
+
+        // Normalize velocity
+        const currentSpeed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        this.vx = (this.vx / currentSpeed) * targetSpeed;
+        this.vy = (this.vy / currentSpeed) * targetSpeed;
+
+        // Update position
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Bounce off walls
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+        // Update tail points
+        this.angle += 0.2;
+        this.points.unshift({ x: this.x, y: this.y });
+        this.points.pop();
+
+        // Add wave motion to tail
+        for (let i = 1; i < this.points.length; i++) {
+          const waveOffset = Math.sin(this.angle + i * 0.3) * 2;
+          const perpX = -this.vy / targetSpeed;
+          const perpY = this.vx / targetSpeed;
+          this.points[i].x += perpX * waveOffset;
+          this.points[i].y += perpY * waveOffset;
+        }
+      }
+
+      draw() {
+        if (this.absorbed) return;
+
+        // Draw head
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(160, 200, 255, 0.8)';
+        ctx.fill();
+
+        // Draw tail
+        ctx.beginPath();
+        ctx.moveTo(this.points[0].x, this.points[0].y);
+        for (let i = 1; i < this.points.length; i++) {
+          ctx.lineTo(this.points[i].x, this.points[i].y);
+        }
+        ctx.strokeStyle = 'rgba(160, 200, 255, 0.6)';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      }
+
+      reset() {
+        this.x = this.savedX;
+        this.y = this.savedY;
+        this.points.fill({ x: this.savedX, y: this.savedY });
+        this.absorbed = false;
+        this.vx = (Math.random() - 0.5) * 2;
+        this.vy = (Math.random() - 0.5) * 2;
+      }
+    }
+
+    let tadpoles = [];
+
+    function addTadpoles(count) {
+      for (let i = 0; i < count; i++) {
+        tadpoles.push(new Tadpole(
+          Math.random() * canvas.width,
+          Math.random() * canvas.height
+        ));
+      }
+    }
+
+    // Initialize with minimum tadpoles
+    addTadpoles(minTadpoles);
+
+    function updateTadpoleCount() {
+      const targetCount = Math.floor(minTadpoles + (maxTadpoles - minTadpoles) * scrollProgress);
+      
+      if (targetCount > tadpoles.length) {
+        addTadpoles(targetCount - tadpoles.length);
+      } else if (targetCount < tadpoles.length) {
+        tadpoles = tadpoles.slice(0, targetCount);
+      }
+    }
+
+    function animate() {
+      ctx.fillStyle = 'rgba(0, 24, 40, 0.2)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw target
+      if (targetPoint) {
+        ctx.beginPath();
+        ctx.arc(targetPoint.x, targetPoint.y, 15, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255, 200, 100, 0.8)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      tadpoles.forEach(tadpole => {
+        tadpole.update();
+        tadpole.draw();
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('scroll', () => {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const newProgress = window.scrollY / maxScroll;
+
+      // If scrolling down past threshold, add target
+      if (newProgress > 0.95 && !targetPoint) {
+        targetPoint = {
+          x: canvas.width / 2,
+          y: canvas.height / 2
+        };
+      }
+      // If scrolling up past threshold, remove target and reset
+      else if (newProgress < 0.9 && targetPoint) {
+        targetPoint = null;
+        tadpoles.forEach(t => t.reset());
+      }
+
+      scrollProgress = newProgress;
+      updateTadpoleCount();
+      scrollHint.style.opacity = scrollProgress > 0 ? '0' : '1';
+    });
+
+    animate();
+  </script>
+</body>
+</html>

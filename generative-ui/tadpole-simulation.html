@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      background: #001828;
+      cursor: pointer;
+    }
+    .canvas-container {
+      position: relative;
+    }
+    .click-hint {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 200, 100, 0.2);
+      color: rgba(255, 200, 100, 0.9);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-family: Arial, sans-serif;
+      border: 1px solid rgba(255, 200, 100, 0.3);
+      opacity: 1;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.05); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #000810;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #234;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #345;
+    }
+    #restartBtn {
+      background: #432;
+    }
+    #restartBtn:hover {
+      background: #543;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="canvas-container">
+      <canvas id="canvas" width="600" height="400"></canvas>
+      <div id="clickHint" class="click-hint">Click anywhere to place target</div>
+    </div>
+    <div class="controls">
+      <button id="playPauseBtn">Pause</button>
+      <button id="restartBtn">Restart</button>
+    </div>
+  </div>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const clickHint = document.getElementById('clickHint');
+    let isPlaying = true;
+    let targetEllipse = null;
+    let sparks = [];
+
+    // Define different flock colors
+    const flockColors = [
+      { fill: 'rgba(160, 200, 255, 0.8)', stroke: 'rgba(160, 200, 255, 0.6)' },
+      { fill: 'rgba(255, 180, 180, 0.8)', stroke: 'rgba(255, 180, 180, 0.6)' },
+      { fill: 'rgba(180, 255, 180, 0.8)', stroke: 'rgba(180, 255, 180, 0.6)' },
+      { fill: 'rgba(255, 255, 180, 0.8)', stroke: 'rgba(255, 255, 180, 0.6)' }
+    ];
+
+    class Spark {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.life = 1;
+        this.angle = Math.random() * Math.PI * 2;
+        this.speed = Math.random() * 2 + 1;
+        this.color = color;
+      }
+
+      update() {
+        this.life -= 0.02;
+        this.x += Math.cos(this.angle) * this.speed;
+        this.y += Math.sin(this.angle) * this.speed;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.fillStyle = this.color.replace('0.8', this.life);
+        ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    class Tadpole {
+      constructor(x, y, flockId, color) {
+        this.x = x;
+        this.y = y;
+        this.vx = Math.random() * 4 - 2;
+        this.vy = Math.random() * 4 - 2;
+        this.tailAngle = 0;
+        this.tailWaveSpeed = 0.15;
+        this.size = 6;
+        this.tailLength = 15;
+        this.absorbed = false;
+        this.flockId = flockId;
+        this.color = color;
+      }
+
+      update(tadpoles) {
+        if (this.absorbed) return;
+
+        if (targetEllipse) {
+          // Move towards ellipse
+          const dx = targetEllipse.x - this.x;
+          const dy = targetEllipse.y - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          this.vx += (dx / dist) * 0.2;
+          this.vy += (dy / dist) * 0.2;
+
+          // Check if reached ellipse
+          if (dist < 20) {
+            this.absorbed = true;
+            // Create sparks
+            for (let i = 0; i < 5; i++) {
+              sparks.push(new Spark(this.x, this.y, this.color.fill));
+            }
+            return;
+          }
+        } else {
+          // Flocking behavior
+          let cx = 0, cy = 0, count = 0;
+          let separationX = 0, separationY = 0;
+          let matchVx = 0, matchVy = 0;
+          
+          // Weak interaction with all tadpoles
+          let globalCx = 0, globalCy = 0, globalCount = 0;
+
+          tadpoles.forEach(other => {
+            if (other !== this && !other.absorbed) {
+              const dx = other.x - this.x;
+              const dy = other.y - this.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+
+              // Weak global interaction
+              if (dist < 150) {
+                globalCx += other.x;
+                globalCy += other.y;
+                globalCount++;
+              }
+
+              // Strong flock interaction
+              if (dist < 100 && other.flockId === this.flockId) {
+                cx += other.x;
+                cy += other.y;
+                matchVx += other.vx;
+                matchVy += other.vy;
+
+                if (dist < 30) {
+                  separationX -= dx / dist;
+                  separationY -= dy / dist;
+                }
+                count++;
+              }
+            }
+          });
+
+          // Strong flock cohesion
+          if (count > 0) {
+            this.vx += (cx / count - this.x) * 0.001;
+            this.vy += (cy / count - this.y) * 0.001;
+            this.vx += (matchVx / count - this.vx) * 0.05;
+            this.vy += (matchVy / count - this.vy) * 0.05;
+            this.vx += separationX * 0.05;
+            this.vy += separationY * 0.05;
+          }
+
+          // Weak global influence
+          if (globalCount > 0) {
+            this.vx += (globalCx / globalCount - this.x) * 0.0001;
+            this.vy += (globalCy / globalCount - this.y) * 0.0001;
+          }
+        }
+
+        // Limit speed
+        const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        if (speed > 4) {
+          this.vx = (this.vx / speed) * 4;
+          this.vy = (this.vy / speed) * 4;
+        }
+
+        // Update position
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Bounce off walls
+        if (this.x < 0) this.vx = Math.abs(this.vx);
+        if (this.x > canvas.width) this.vx = -Math.abs(this.vx);
+        if (this.y < 0) this.vy = Math.abs(this.vy);
+        if (this.y > canvas.height) this.vy = -Math.abs(this.vy);
+
+        // Update tail wave motion
+        this.tailAngle += this.tailWaveSpeed;
+      }
+
+      draw() {
+        if (this.absorbed) return;
+
+        const angle = Math.atan2(this.vy, this.vx);
+        
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(angle);
+
+        // Draw head
+        ctx.beginPath();
+        ctx.fillStyle = this.color.fill;
+        ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Draw tail
+        ctx.beginPath();
+        ctx.moveTo(-this.size, 0);
+        for (let i = 0; i < this.points; i++) {
+          const waveOffset = Math.sin(this.tailAngle + i * 0.3) * 3;
+          ctx.lineTo(-this.size - i, waveOffset);
+        }
+        ctx.strokeStyle = this.color.stroke;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.restore();
+      }
+    }
+
+    let tadpoles = [];
+
+    function initTadpoles() {
+      const newTadpoles = [];
+      const numFlocks = flockColors.length;
+      const tadpolesPerFlock = 8;
+
+      // Create tadpoles for each flock
+      for (let flockId = 0; flockId < numFlocks; flockId++) {
+        const centerX = Math.random() * canvas.width;
+        const centerY = Math.random() * canvas.height;
+        
+        for (let i = 0; i < tadpolesPerFlock; i++) {
+          // Spawn tadpoles close to their flock center
+          const x = centerX + (Math.random() - 0.5) * 100;
+          const y = centerY + (Math.random() - 0.5) * 100;
+          newTadpoles.push(new Tadpole(x, y, flockId, flockColors[flockId]));
+        }
+      }
+      
+      return newTadpoles;
+    }
+
+    function reset() {
+      targetEllipse = null;
+      sparks = [];
+      tadpoles = initTadpoles();
+      isPlaying = true;
+      playPauseBtn.textContent = 'Pause';
+      clickHint.style.opacity = '1';
+    }
+
+    tadpoles = initTadpoles();
+
+    function drawEllipse() {
+      if (!targetEllipse) return;
+      
+      ctx.beginPath();
+      ctx.ellipse(
+        targetEllipse.x, 
+        targetEllipse.y, 
+        40, 30, 
+        0, 0, Math.PI * 2
+      );
+      ctx.strokeStyle = 'rgba(255, 200, 100, 0.8)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    function animate() {
+      if (!isPlaying) return;
+
+      ctx.fillStyle = 'rgba(0, 24, 40, 0.2)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      drawEllipse();
+
+      // Update and draw sparks
+      sparks = sparks.filter(spark => spark.life > 0);
+      sparks.forEach(spark => {
+        spark.update();
+        spark.draw();
+      });
+
+      tadpoles.forEach(tadpole => {
+        tadpole.update(tadpoles);
+        tadpole.draw();
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    playPauseBtn.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      playPauseBtn.textContent = isPlaying ? 'Pause' : 'Play';
+      if (isPlaying) {
+        animate();
+      }
+    });
+
+    restartBtn.addEventListener('click', reset);
+
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      targetEllipse = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+      clickHint.style.opacity = '0';
+    });
+
+    animate();
+  </script>
+</body>
+</html>

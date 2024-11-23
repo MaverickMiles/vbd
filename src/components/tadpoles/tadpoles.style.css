@@ -1,0 +1,62 @@
+.monologue-frame {
+    height: 100%;
+    width: 100%;
+    max-width: 1250px;
+    /*overflow-y: scroll;*/
+    /*overflow-x: hidden;*/
+    border-radius: 5px;
+    position: relative;
+}
+
+.monologue-frame::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: #c0c0aa; /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #c0c0aa, #1cefff); /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(
+            45deg,
+            #c0c0aa,
+            #001a1a,
+            #006666,
+            #7fecee,
+            #006666,
+            #001a1a
+    ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+    border-radius: 5px;
+    z-index: 1;
+    animation: rotate 40s linear infinite;
+    background-size: 400%;
+    /*box-shadow: 0 10px 30px rgba(127, 236, 238, 0.3);*/
+    box-shadow:
+            0px 3px 14px 2px rgba(127, 236, 238, 0.12),
+            0px 8px 10px 1px rgba(127, 236, 238, 0.14),
+            0px 5px 5px -3px rgba(127, 236, 238, 0.20);
+}
+.monologue-frame::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #171616;
+    border-radius: 5px;
+    z-index: 1;
+}
+
+@keyframes rotate {
+    0% {
+        background-position: 0% 0%;
+    }
+    50% {
+        background-position: 400% 0%;
+    }
+    100% {
+        background-position: 0% 0%;
+    }
+}

@@ -1,0 +1,44 @@
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.flowers-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.flower {
+    position: absolute;
+    transition: transform 200ms ease-out;
+}
+
+.content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding-left: 10vw;
+    padding-top: 50vh;
+    padding-bottom: 50vh;
+    position: relative;
+}
+
+.paragraph {
+    text-align: start;
+    font-size: 1.25rem;
+    line-height: 1.75;
+    margin-bottom: 75px;
+    transition: opacity 300ms ease-out;
+    position: relative;
+    z-index: 1;
+    color: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.paragraph:last-child {
+    margin-bottom: 0;
+}
