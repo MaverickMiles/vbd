@@ -46,7 +46,7 @@ export interface BookCoverProps {
     title: string;
 }
 
-const BookCover = (props: BookCoverProps) => {
+const FrontBookCover = (props: BookCoverProps) => {
     const {title} = props;
     return (
         <Container>
@@ -61,4 +61,4 @@ const BookCover = (props: BookCoverProps) => {
     );
 };
 
-export {BookCover};
+export {FrontBookCover};

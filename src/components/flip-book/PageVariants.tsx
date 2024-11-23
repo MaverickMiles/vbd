@@ -2,6 +2,8 @@ import React, {CSSProperties} from "react";
 import styled from "styled-components";
 import {pageHeight, pageWidth} from "./common";
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
+import _ from "lodash";
+import { motion } from "framer-motion";
 
 export const EmptyPage = styled.div`
   width: ${pageWidth}px;
@@ -33,7 +35,7 @@ export const TitleSectionPage = (props: PageProps) => {
     return (
         <EmptyPage>
             {/* animation would be nice */}
-            <TitleContainer>{text}</TitleContainer>
+            <TitleContainer>{text.split('\n').map(each => (<div>{each}</div>))}</TitleContainer>
         </EmptyPage>
     )
 }
@@ -73,10 +75,10 @@ export const PromptSectionPage = (props: PageProps) => {
 
 
 const CardMessage = styled.div`
-  text-align: left;
   display: flex;
-  align-items: center;
-  justify-self: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
   font-family: "DM Mono";
   font-size: 14px;
   font-style: italic;
@@ -86,6 +88,11 @@ const CardMessage = styled.div`
   width: 100%;
   height: 100%;
 `;
+
+const Paragraph = styled.div`
+  
+`;
+
 
 const CardAuthor = styled.div`
   position: absolute;
@@ -100,6 +107,14 @@ const CardAuthor = styled.div`
   letter-spacing: 1.4px;
 `;
 
+const centeredStyle: CSSProperties = {
+    textAlign: 'center'
+}
+
+const nonCenteredStyle: CSSProperties = {
+    textAlign: 'left'
+}
+
 export interface CardPageProps {
     text: string;
     author: string;
@@ -108,11 +123,21 @@ export interface CardPageProps {
 }
 
 export const CardPage = (props: CardPageProps) => {
-    const {text, author, textStyleOverrides = {}} = props;
+    const {text, author, centered = true, textStyleOverrides = {}} = props;
+    const style = _.merge(centered ? centeredStyle: nonCenteredStyle, textStyleOverrides);
 
     return (
         <EmptyPage style={{padding: 50,}}>
-            <CardMessage style={textStyleOverrides}>{text}</CardMessage>
+            <CardMessage>
+                {text.trim().split('\n').map((paragraph, index) => (
+                    <motion.div initial={{opacity: 0}} animate={{opacity: 1}}
+                                transition={{duration: 1, delay: index * 0.1, easing: 'easeInOut'}}
+                                style={style}
+                    >
+                        {paragraph}
+                    </motion.div>
+                ))}
+            </CardMessage>
             <CardAuthor>{author}</CardAuthor>
         </EmptyPage>
     );

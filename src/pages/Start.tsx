@@ -6,6 +6,7 @@ import {VbdAnimation} from "../components/VbdAnimation";
 import ShouldRender from "../components/ShouldRender";
 import {FlipBook} from "../components/flip-book/FlipBook";
 import {SpeakerMonologue} from "./SpeakerMonologue";
+import { Trivia } from './Trivia';
 
 const EntrypointContainer = styled.div`
   display: flex;
@@ -33,6 +34,7 @@ const StartPage = observer(() => {
         start();
     }
 
+    return <Trivia />
     return (
         <EntrypointContainer>
             <ShouldRender condition={!isAnimating}>

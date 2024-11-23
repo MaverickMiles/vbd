@@ -7,15 +7,16 @@ import {pages, pageViewMap} from "../../metadata/book.metadata";
 import {Slider} from "@mui/material";
 
 const PageContainer = styled.div<{ direction: 'left' | 'right' }>`
-  //background: darkblue;
+  //background: rgba(42, 42, 42, 0.8);
   //color: white;
 
-  ${({direction}) => direction === 'left' ? `
-    border-left: 0;
-    box-shadow: inset 7px 0 30px -7px rgba(0, 0, 0, 1);
-  ` : `
+  ${({direction}) => direction === 'right' ? `
     border-right: 0;
     box-shadow: inset -7px 0 30px -7px rgba(0, 0, 0, 1);
+  ` : `
+    border-left: 0;
+    box-shadow: inset 7px 0 30px -7px rgba(0, 0, 0, 1);
+    border-left: 2px solid rgba(42, 42, 42, 0.8);
   `}
 `;
 

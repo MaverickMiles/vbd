@@ -1,5 +1,5 @@
 import {CardPageProps, PageProps, PhotoPageProps} from "../components/flip-book/PageVariants";
-import {BookCoverProps} from "../components/flip-book/BookCover";
+import {BookCoverProps} from "../components/flip-book/FrontBookCover";
 
 export type PageType = 'front_cover' | 'back_cover' | 'empty' | 'section' | 'prompt' | 'card' | 'photo';
 
