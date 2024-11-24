@@ -298,9 +298,7 @@ Don’t take it!
     },
     VM270: {
         text: `
-こんにちはV、マルチバース270の私です。
-Willがあなたにアニメを見るように説得しているって聞きました。
-彼の言うことは気にしないで。好きなようにすればいいよ！
+お誕生日おめでとうね
         `,
         author: authorMap.VM270.name,
     },
@@ -316,6 +314,7 @@ let me know.
     VM272: {
         text: `
 Happy birthday V.
+I hope you never let failures weigh you down to the past.
 I hope you keep reaching for the stars like I do on my planet.
 Literally...
         `,
