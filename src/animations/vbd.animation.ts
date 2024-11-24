@@ -1,20 +1,80 @@
 import {createRef, RefObject} from "react";
 import anime, {AnimeParams} from "animejs";
+import {action, makeObservable, observable} from "mobx";
 
 interface Point {
     x: number;
     y: number;
 }
 
+
+const opacityParams: AnimeParams[] = [
+    {
+        targets: '.letter.letter-left',
+        easing: 'linear',
+        // color: 'white',
+        opacity: 0,
+        duration: 300,
+    }, {
+        targets: '.letter.letter-center',
+        easing: 'linear',
+        // color: 'white',
+        opacity: 0,
+        duration: 300,
+    }, {
+        targets: '.letter.letter-right',
+        easing: 'linear',
+        // color: 'white',
+        opacity: 0,
+        duration: 300,
+    },
+]
+
+const motionParams: AnimeParams[] = [
+    {
+        targets: '.letter.letter-left',
+        easing: 'easeInOutExpo',
+        scale: [1, 1.25],
+        translateX: [0, '-0.25em'],
+        duration: 3000,
+    }, {
+        targets: '.letter.letter-center',
+        easing: 'easeInOutExpo',
+        scale: [1, 1.2],
+        duration: 3000,
+    }, {
+        targets: '.letter.letter-right',
+        easing: 'easeInOutExpo',
+        scale: [1, 1.25],
+        translateX: [0, '0.25em'],
+        duration: 3000,
+    },
+];
+
+const runTimeline = (params: AnimeParams[]) => anime.timeline().add(params[1], '-=100').add(params[2], '-=100').add(params[0], '-=100');
+const opacityTimeline = () => runTimeline(opacityParams);
+const motionTimeline = () => runTimeline(motionParams);
+
+
 class Animator {
     isRunning = false;
+    isFinished = false;
+    lock = false;
     textRef: RefObject<HTMLDivElement> = createRef();
     containerRef: RefObject<HTMLDivElement> = createRef();
+    audioRef:RefObject<HTMLAudioElement> = createRef();
+    constructor() {
+        makeObservable(this,  {isFinished: observable, setIsFinished: action}, {autoBind: true});
+    }
 
     run = () => {
         if (this.isRunning) return;
         this.isRunning = true;
-        return this.animateLetters();
+        this.animateLetters();
+    }
+
+    setIsFinished = (isFinished: boolean) => {
+        this.isFinished  = isFinished
     }
 
     generateSmoothPath(radius: number) {
@@ -84,42 +144,45 @@ class Animator {
         return points;
     }
 
-    disintegrate(text: HTMLElement, container: HTMLElement,) {
+    disintegrate = (text: HTMLElement, container: HTMLElement,) => {
         const particlePoints = this.createParticlePoints(text);
-
+        console.log({particlePoints: particlePoints.length});
         particlePoints.forEach((point, i) => {
             const particle = this.createParticleElement(text, point);
-            text.appendChild(particle);
+            document.body.appendChild(particle);
 
             // Slight random delay for initial movement
             const delay = Math.random() * 0.5;
+            const animator = this;
 
             // First animation: Smooth floating (2.5s)
             requestAnimationFrame(() => {
-                particle.style.animation = `
-            particleFloat 3s cubic-bezier(0.4, 0, 0.2, 1) ${delay}s forwards
-          `;
+                particle.style.animation = `particleFloat 2.5s cubic-bezier(0.4, 0, 0.2, 1) ${delay}s forwards`;
+                // Second animation: Dispersal (1.5s)
+                setTimeout(() => {
+                    if (!this.lock) {
+                        this.lock = true;
+                        if (this.textRef.current) {
+                            console.log(this.textRef.current);
+                            this.textRef.current.style.backgroundColor = 'black';
+                        }
+                    }
+                    particle.style.animation = `particleFade 3s cubic-bezier(0.4, 0, 0.2, 1) forwards`;
+                }, 2000 + delay * 1000);
+                // Cleanup
+                setTimeout(() => {
+                    particle.remove();
+                    animator.isRunning = false;
+                    animator.setIsFinished(true);
+                }, 4000 + delay * 1000);
             });
-
-            // Second animation: Dispersal (1.5s)
-            // setTimeout(() => {
-            //     container.style.backgroundColor = 'black';
-            //     particle.style.animation = `particleFade 5s cubic-bezier(0.4, 0, 0.2, 1) forwards`;
-            // }, 2500 + delay * 1000);
-            // });
-
-            // const animator = this;
-            // Cleanup
-            // setTimeout(() => {
-            //     particle.remove();
-            //     animator.isRunning = false;
-            // }, 4000 + delay * 1000);
         });
 
         // Reset text after animation
-        // setTimeout(() => {
-        //     this.textRef.current.style.opacity = '1';
-        // }, 4500);
+        setTimeout(() => {
+            if (this.textRef.current)
+                this.textRef.current.style.opacity = '1';
+        }, 4500);
     }
 
     animateLetters() {
@@ -129,48 +192,17 @@ class Animator {
         const letters = document.querySelectorAll<HTMLElement>('.letter');
 
         // opacity
-        const animeParams: AnimeParams[] = [
-            {
-                targets: '.letter.letter-left',
-                easing: 'easeInOutExpo',
-                scale: [1, 1.25],
-                translateX: [0, '-0.25em'],
-                duration: 2000,
-                delay: 40
-            }, {
-                targets: '.letter.letter-center',
-                easing: 'easeInOutExpo',
-                scale: [1, 1.2],
-                duration: 1500,
-            }, {
-                targets: '.letter.letter-right',
-                easing: 'easeInOutExpo',
-                scale: [1, 1.25],
-                translateX: [0, '0.25em'],
-                duration: 3000,
-                delay: 80
-            },
-        ];
 
         // const promises = [];
-        // letters.forEach((letter, index) => {
-        //     const time = Date.now();
-        //     this.disintegrate(letter, text);
-        //     console.log(`Time spent creating particles for ${letter.innerText}`, Date.now().valueOf() - time.valueOf());
-        //     letter.style.color = 'white';
-        // });
-
-        const promise = Promise.all(animeParams.map((p) => anime(p).finished));
-
-        return promise;
-
-        // anime( {
-        //     targets: text,
-        //     opacity: [1,0],
-        //     duration: 4000,
-        //     easing: 'easeInOutExpo'
-        // });
-
+        letters.forEach((letter, index) => {
+            const time = Date.now();
+            this.disintegrate(letter, text);
+            console.log(`Time spent creating particles for ${letter.innerText}`, Date.now().valueOf() - time.valueOf());
+            // letter.style.color = 'white';
+            letter.style.opacity = '0';
+            // letter.style.textShadow = 'none';
+        });
+        this.audioRef.current?.play();
     }
 
     animateLetterPoints() {
@@ -192,8 +224,8 @@ class Animator {
         // particle.appendChild(bubbleInner);
 
         // Initial position
-        particle.style.left = `${pos.x}px`;
-        particle.style.top = `${pos.y}px`;
+        particle.style.left = `${pos.x + rect.x}px`;
+        particle.style.top = `${pos.y + rect.y}px`;
 
         // Generate smooth floating path
         const floatPath = this.generateSmoothPath(3);

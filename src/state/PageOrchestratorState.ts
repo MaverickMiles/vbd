@@ -1,24 +1,27 @@
 import {getPage, SupportedPage} from "../metadata/pages.metadata";
 import {autorun, makeAutoObservable} from "mobx";
 import _ from "lodash";
+import {PageState} from "./PageState";
+import {createRef, RefObject} from "react";
+import {toggleFullscreen} from "../utils/dom.utils";
 
 export const pageOrder: SupportedPage[] = [
     'monologue',
-    'birthday_wishes',
     'trivia',
-    'spider'
 ];
 
 class PageOrchestratorState {
     activePage: SupportedPage  = pageOrder[0];
     isStarted: boolean = false;
+    pages: PageState[] = [];
+    scrollContainerRef = createRef<HTMLDivElement>();
 
     constructor() {
         makeAutoObservable(this, {}, {autoBind: true});
-        autorun(() => {
-            // console.log(this.activePage);
-            // console.log(this.activePageIndex);
-        });
+    }
+
+    get activePages() {
+        return [];
     }
 
     get previousPage() {
@@ -75,6 +78,18 @@ class PageOrchestratorState {
 
         this.activePage = pageOrder[pageIndex];
         this.activePageState.scrollIntoView();
+    }
+
+    lock() {
+        const scrollContainer = this.scrollContainerRef.current;
+        if (!scrollContainer) return;
+        scrollContainer.style.overflow = 'hidden';
+    }
+
+    unlock() {
+        const scrollContainer = this.scrollContainerRef.current;
+        if (!scrollContainer) return;
+        scrollContainer.style.overflow = 'scroll';
     }
 }
 

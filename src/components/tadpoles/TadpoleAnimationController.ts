@@ -5,9 +5,10 @@ import _ from "lodash";
 import {RefController} from "./RefController";
 import {TadpoleTargetController} from "./TadpoleTargetController";
 import anime from "animejs";
+import {getPage} from "../../metadata/pages.metadata";
 
 const minTadpoles = 5;
-const maxTadpoles = 100;
+const maxTadpoles = 250;
 
 export type TransitionState = 'NONE' | 'SWIMMING' | 'ABSORBING' | 'REVEALING' | 'REVEALED';
 
@@ -74,6 +75,7 @@ const transitionController: Record<TransitionState, TransitionController> = {
     NONE: {
         onEnter(controller) {
             controller.removeTadpoles(controller.tadpoles.length);
+            controller.refController.audioRef.current?.play();
         },
         onExit(controller) {
             if (controller.tadpoles.length === 0) {
@@ -114,7 +116,10 @@ const transitionController: Record<TransitionState, TransitionController> = {
             // });
         }
     },
-    REVEALED: {},
+    REVEALED: {
+        onEnter(controller) {
+        }
+    },
 };
 
 class TadpoleAnimationController {
@@ -127,11 +132,15 @@ class TadpoleAnimationController {
     transitionState: TransitionState = 'SWIMMING';
     refController: RefController = new RefController();
     revealedAtLeastOnce = false;
+    EOF = false;
+
     constructor() {
         makeObservable(this, {
             transitionState: observable,
             revealedAtLeastOnce: observable,
-            setTransitionState: action
+            EOF: observable,
+            setTransitionState: action,
+            setEOF: action,
         }, {autoBind: true});
         this.tadpoleTarget = new TadpoleTargetController(this);
         autorun(() => {
@@ -251,8 +260,21 @@ class TadpoleAnimationController {
         } else if (newProgress === 0) {
             this.setTransitionState('NONE');
         }
+
         this.scrollProgress = newProgress;
-        // console.log("Scroll Progress", newProgress);
+
+        if (this.refController.endDetectorInView()) {
+            this.setEOF();
+        }
+
+        this.refController.updateParagraphsOpacity();
+
+        getPage('monologue').state.scrollIntoView();
+    }
+
+    setEOF() {
+        if (this.EOF) return;
+        this.EOF = true;
     }
 
     skipRevealAnimation = () => {

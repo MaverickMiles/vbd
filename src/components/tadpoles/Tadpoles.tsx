@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useContext, useEffect} from 'react';
 import styled from "styled-components";
 
 import {TadpoleAnimationController} from "./TadpoleAnimationController";
@@ -13,6 +13,8 @@ import {AnimatePresence, motion} from 'framer-motion';
 import "./tadpoles.style.css";
 import {AudioPlayer} from "./AudioPlayer";
 import {Button} from '../Button';
+import {useIntersectionObserver} from "usehooks-ts";
+import {ScrollLockContext} from "../../contexts/scroll-lock-context";
 
 const BackdropFilter = styled.div`
   background: linear-gradient(180deg, rgba(23, 22, 22, 0) 0%, rgba(23, 22, 22, 1) 100%);
@@ -138,9 +140,18 @@ const EggLight = () => {
 }
 
 
+const EndDetector = styled.div`
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  position: absolute;
+  bottom: 0;
+`;
+
 interface Props {
     // onFinish: (isDone: boolean) => void;
 }
+
 
 const Tadpoles = observer((props: Props) => {
     const controller = useLocalObservable(() => new TadpoleAnimationController());
@@ -154,7 +165,13 @@ const Tadpoles = observer((props: Props) => {
         eggLightRef,
         eggContainerRef,
         avatarRef,
+        endDetectorRef
     } = controller.refController;
+    const {isIntersecting, ref} = useIntersectionObserver(
+        {root: contentFrameRef.current, threshold: 1}
+    )
+    const showScrollIndicator = scrollProgress < 0.8 || (scrollProgress > 0.9 && (controller.transitionState === 'REVEALED'));
+    const {lock, unlock} = useContext(ScrollLockContext);
 
     useEffect(() => {
         const {start, stop} = controller;
@@ -167,6 +184,16 @@ const Tadpoles = observer((props: Props) => {
             window.removeEventListener('resize', onWindowResize);
         }
     }, []);
+
+    useEffect(() => {
+        console.log({EOF: controller.EOF});
+        if (controller.EOF) {
+            console.log("Calling unlock");
+            unlock();
+        } else {
+            lock();
+        }
+    }, [controller.EOF]);
 
     const onWindowResize = () => {
         if (!canvasRef.current) return;
@@ -184,20 +211,20 @@ const Tadpoles = observer((props: Props) => {
     // apparently relative impacts the scrollability of an element
 
     return (
-        <motion.div initial={{opacity: 0}} animate={{opacity: 1}} transition={{duration: 2, easing: 'easeInOut'}}>
+        <motion.div initial={{opacity: 0}} animate={{opacity: 1}} transition={{duration: 4, easing: 'easeInOut'}}>
             <Container>
                 <CanvasContainer ref={canvasContainerRef}>
                     <canvas ref={canvasRef}/>
                 </CanvasContainer>
                 <div className={'monologue-frame'}>
-                    {/*<BackdropFilter style={{top: 0}}/>*/}
-                    {/*<BackdropFilter style={{bottom: 0}}/>*/}
                     <ContentContainer onScroll={controller?.scrollEventListener} ref={contentFrameRef}>
                         <ScrollableContent ref={scrollableContentRef}>
                             <div style={{paddingBlock: '20vh'}}>
-                                {/*<motion.div initial={{opacity: 0}} animate={{opacity: 1}}>*/}
-                                    <AnimatedParagraph paragraphs={inceptionParagraphs} scrollRef={contentFrameRef}/>
-                                {/*</motion.div>*/}
+                                <motion.div initial={{opacity: 0}}
+                                            animate={{opacity: 1}}
+                                            transition={{ease: 'easeInOut', duration: 3}}>
+                                    <AnimatedParagraph paragraphs={inceptionParagraphs} controller={controller}/>
+                                </motion.div>
                             </div>
                             <EggContainer ref={eggContainerRef}>
                                 {/*<EggInnerContainer>*/}
@@ -224,17 +251,17 @@ const Tadpoles = observer((props: Props) => {
                         </ScrollableContent>
                         <ShouldRender condition={controller?.transitionState === 'REVEALED'}>
                             <ScrollableContent style={{paddingBlock: '40vh'}}>
-                                <AnimatedParagraph paragraphs={postInceptionParagraphs} scrollRef={scrollableContentRef}/>
+                                <AnimatedParagraph paragraphs={postInceptionParagraphs} controller={controller}/>
+                                <EndDetector ref={endDetectorRef}></EndDetector>
                             </ScrollableContent>
                         </ShouldRender>
                     </ContentContainer>
                     <motion.div initial={{opacity: 0}} animate={{opacity: 1}}
-                                transition={{duration: 2, easing: 'easeInOut'}}>
-                        <ScrollIndicator
-                            condition={scrollProgress < 0.8 || (scrollProgress > 0.9 && controller.transitionState === 'REVEALED')}/>
+                                transition={{duration: 2, delay: 3, easing: 'easeInOut'}}>
+                        <ScrollIndicator condition={showScrollIndicator}/>
                     </motion.div>
                     <AudioPlayerContainer>
-                        <AudioPlayer/>
+                        <AudioPlayer controller={controller}/>
                     </AudioPlayerContainer>
                     <SkipButtonContainer>
                         <ShouldRender
@@ -248,8 +275,7 @@ const Tadpoles = observer((props: Props) => {
                 </div>
             </Container>
         </motion.div>
-    )
-        ;
+    );
 });
 
 export {Tadpoles};

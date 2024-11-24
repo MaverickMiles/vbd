@@ -34,17 +34,17 @@ and a cup of milk
 Ok multiple cups 
 (everyday)
 
+It was a simpler time.
+
 She was fluent with what she loved—
 Dogs and Damon Salvatore
-
-It was a simpler time.
 
 She would sleep and dream...
 
 For she had not yet learned the fear 
 of giving herself up to sleep at night
 
-Her Sundays weren't haunted
+Her Sundays were not yet haunted
 By the ghost of Monday mornings to come.
 
 She was not yet burdened
@@ -76,7 +76,7 @@ between understanding and division.
 She is Equipped 
 with a 2x speed mind
 With which she picks apart textbooks 
-and the chicken nuggets on her plate.
+and chicken nuggets on her plate.
 
 Sometimes this mind gets the best of her 
 (Actually many times)

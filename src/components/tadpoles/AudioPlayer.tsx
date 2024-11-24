@@ -2,20 +2,25 @@ import styled from "styled-components";
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import ShouldRender from "../ShouldRender";
-import { IconButton } from "@mui/material";
-import React, {useEffect, useRef, useState} from "react";
-import {Simulate} from "react-dom/test-utils";
-import playing = Simulate.playing;
+import {IconButton} from "@mui/material";
+import React, {useEffect, useState} from "react";
+import {TadpoleAnimationController} from "./TadpoleAnimationController";
 
 const Container = styled.div`
   color: white;
+  position: fixed;
+  top: 75px;
 `;
 
-const audioUrl = `/theme-song.mp3`;
+const audioUrl = `/at-your-best.mp3`;
 
-export const AudioPlayer = () => {
-    const audioRef = useRef<HTMLAudioElement>(null);
-    const [isPlaying, setIsPlaying] = useState(true);
+interface Props {
+    controller: TadpoleAnimationController;
+}
+
+export const AudioPlayer = (props: Props) => {
+    const audioRef = props.controller.refController.audioRef;
+    const [isPlaying, setIsPlaying] = useState(false);
 
     useEffect(() => {
         if (isPlaying) {
@@ -29,10 +34,10 @@ export const AudioPlayer = () => {
         <IconButton onClick={() => setIsPlaying(playing => !playing)}>
             <Container>
                 <ShouldRender condition={isPlaying}>
-                    <VolumeOffIcon color={'inherit'}/>
+                    <VolumeUpIcon color={'inherit'}/>
                 </ShouldRender>
                 <ShouldRender condition={!isPlaying}>
-                    <VolumeUpIcon color={'inherit'}/>
+                    <VolumeOffIcon color={'inherit'}/>
                 </ShouldRender>
             </Container>
             <audio src={audioUrl} ref={audioRef}/>

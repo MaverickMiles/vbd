@@ -1,8 +1,8 @@
-import React, {RefObject, useEffect, useId, useRef} from "react";
+import React, {useEffect, useId} from "react";
 import styled from "styled-components";
-import _ from "lodash";
 import '../styles/scroll-fade-text.css';
-import anime from "animejs";
+import {motion} from "framer-motion";
+import {TadpoleAnimationController} from "./tadpoles/TadpoleAnimationController";
 
 const Container = styled.div`
   display: flex;
@@ -36,24 +36,9 @@ const LineContainer = styled.div`
 
 `;
 
-
-const fadeOnScroll = <T extends HTMLElement>(container: HTMLElement, el: HTMLElement) => {
-    const containerRect = container.getBoundingClientRect();
-    const containerHeight = containerRect.height;
-    const viewportCenter = containerHeight / 2;
-    const rect = el.getBoundingClientRect();
-    const elementCenter = (rect.top + rect.bottom) / 2;
-    const distanceFromCenter = Math.abs(elementCenter - viewportCenter);
-    const maxDistance = containerHeight / 2;
-    const opacity = Math.max(0.1, 1 - Math.pow(distanceFromCenter / maxDistance, 2));
-    el.style.opacity = opacity.toString();
-    el.style.transform = `matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)`
-};
-
-
 interface AnimatedParagraphProps {
     paragraphs: string[];
-    scrollRef: RefObject<HTMLElement>;
+    controller: TadpoleAnimationController;
 }
 
 const container = {
@@ -95,8 +80,8 @@ const letter = {
 };
 
 export const AnimatedParagraph = (props: AnimatedParagraphProps) => {
-    const {paragraphs, scrollRef} = props;
-    const paragraphRefs = useRef<HTMLElement[]>([]);
+    const {paragraphs, controller} = props;
+    const {addParagraph} = controller.refController;
     const id = useId();
     const letterClassName = `${id.slice(0, 6)}-letter`;
 
@@ -118,24 +103,15 @@ export const AnimatedParagraph = (props: AnimatedParagraphProps) => {
 
     }, []);
 
-    const onScroll = (container: HTMLElement) => {
-        paragraphRefs.current.forEach(paragraph => {
-            console.log("On Scroll is working", container);
-            fadeOnScroll(container, paragraph);
-        });
-    }
-
     return (
         <Container>
             <ContentContainer>
-                {paragraphs.map((text, index) => (
-                    <div
-                        ref={el => _.set(paragraphRefs.current, index, el)}
-                    >
-                        <ParagraphContainer key={`paragraph-${index}`}>
+                {paragraphs.map((text, pIndex) => (
+                    <div>
+                        <ParagraphContainer key={`paragraph-${pIndex}`}>
                             {
-                                text.split('\n').map(l => (
-                                    <div>
+                                text.split('\n').map((l, lIndex) => (
+                                    <div ref={el => addParagraph(`${id}${pIndex}${lIndex}`, el)}>
                                         {
                                             l.split('').map(l => (
                                                 <span className={letterClassName}>{l}</span>

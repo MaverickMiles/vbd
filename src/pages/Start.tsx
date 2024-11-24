@@ -7,6 +7,8 @@ import ShouldRender from "../components/ShouldRender";
 import {FlipBook} from "../components/flip-book/FlipBook";
 import {SpeakerMonologue} from "./SpeakerMonologue";
 import { Trivia } from './Trivia';
+import {Button} from "../components/Button";
+import {toggleFullscreen} from "../utils/dom.utils";
 
 const EntrypointContainer = styled.div`
   display: flex;
@@ -14,6 +16,7 @@ const EntrypointContainer = styled.div`
   height: 100%;
   align-items: center;
   justify-content: center;
+  background: #000;
 `;
 
 const StartButton = styled.button`
@@ -27,6 +30,7 @@ const StartPage = observer(() => {
     const onStart = () => {
         // animate VBD
         setIsAnimating(true);
+        toggleFullscreen(document.documentElement);
         // start();
     };
 
@@ -34,11 +38,10 @@ const StartPage = observer(() => {
         start();
     }
 
-    return <Trivia />
     return (
         <EntrypointContainer>
             <ShouldRender condition={!isAnimating}>
-                <StartButton onClick={onStart}>Start</StartButton>
+                <Button onClick={onStart} label={'Start'}/>
             </ShouldRender>
             <ShouldRender condition={isAnimating}>
                 <VbdAnimation onFinish={onAnimationEnd} />

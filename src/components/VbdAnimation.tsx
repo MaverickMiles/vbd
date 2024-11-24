@@ -3,8 +3,11 @@ import styled from "styled-components";
 import {primaryRed} from "../styles/colors";
 import '../styles/vbd.css';
 import {Animator} from "../animations/vbd.animation";
+import anime from "animejs";
+import {observer, useLocalObservable} from "mobx-react";
 
 const VbdContainer = styled.div`
+  background: white;
   display: flex;
   width: 100%;
   height: 100%;
@@ -13,7 +16,7 @@ const VbdContainer = styled.div`
   color: ${primaryRed};
   text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   font-family: "Helvetica Neue", serif;
-  font-size: 300px;
+  font-size: 150px;
   font-style: normal;
   font-weight: 700;
   line-height: normal;
@@ -23,10 +26,8 @@ const VbdContainer = styled.div`
 const Letter = styled.span`
   position: relative;
   display: inline-block;
-  transition: color 4s ease-in-out;
+  transition: opacity 3s ease-in-out;
 `
-
-const animator = new Animator();
 
 const audioUrl = '/TED-Intro-Animation.mp3';
 
@@ -34,16 +35,23 @@ interface Props {
     onFinish: () => void;
 }
 
-const VbdAnimation = (props: Props) => {
-    const audioRef = useRef<HTMLAudioElement>(null);
+
+const VbdAnimation = observer((props: Props) => {
+    const animator = useLocalObservable(() => new Animator());
 
     useEffect(() => {
         const runner = animator.run.bind(animator);
         setTimeout(() => {
-            audioRef.current?.play();
            runner();
         }, 1000);
     }, []);
+
+    useEffect(() => {
+        if (animator.isFinished) {
+            console.log("is finished");
+            props.onFinish();
+        }
+    }, [animator.isFinished]);
 
     return (
         <VbdContainer ref={animator.containerRef}>
@@ -52,9 +60,9 @@ const VbdAnimation = (props: Props) => {
                 <Letter className={'letter letter-center'}>B</Letter>
                 <Letter className={'letter letter-right'}>D</Letter>
             </VbdContainer>
-            <audio ref={audioRef} src={audioUrl}/>
+            <audio ref={animator.audioRef} src={audioUrl}/>
         </VbdContainer>
     );
-};
+});
 
 export {VbdAnimation}

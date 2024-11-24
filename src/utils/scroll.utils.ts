@@ -65,3 +65,16 @@ export function getScrollMetrics(element: HTMLElement): ScrollMetrics {
 // const scrollableDiv = document.querySelector('.scrollable-container');
 // const metrics = getScrollMetrics(scrollableDiv);
 // console.log(`Scrolled ${metrics.scrollPercentY.toFixed(1)}% vertically`);
+
+
+export const fadeOnScroll = <T extends HTMLElement>(container: HTMLElement, el: HTMLElement) => {
+    const containerRect = container.getBoundingClientRect();
+    const containerHeight = containerRect.height;
+    const viewportCenter = containerHeight / 2;
+    const rect = el.getBoundingClientRect();
+    const elementCenter = (rect.top + rect.bottom) / 2;
+    const distanceFromCenter = Math.abs(elementCenter - viewportCenter);
+    const maxDistance = containerHeight / 2;
+    const opacity = Math.max(0.1, 1 - Math.pow(distanceFromCenter / maxDistance, 2));
+    el.style.opacity = opacity.toString();
+};

@@ -6,41 +6,36 @@ import {PageOrchestratorState, pageOrder} from "../state/PageOrchestratorState";
 import {StartPage} from "../pages/Start";
 import styled from "styled-components";
 import ShouldRender from "./ShouldRender";
-import {End} from "../pages/End";
-import {useScrollLock} from "usehooks-ts";
 import {ScrollLockContext} from "../contexts/scroll-lock-context";
 import {Page} from "./page-orchestrator/Page";
-import {AvatarReveal} from "../pages/AvatarReveal";
-import { VbdAnimation } from "./VbdAnimation";
-import { Trivia } from "../pages/Trivia";
 
 const Container = styled.div`
   height: 100vh;
   width: 100vw;
   overflow: scroll;
+  display: flex;
+  flex-direction: column;
+  gap: 80vh;
+  background: black;
 `;
 
 const containerId = 'scrollable';
 
 const PageOrchestrator = observer(() => {
     const state = useLocalObservable(() => new PageOrchestratorState());
-    const scrollLockProvider = useScrollLock({
-        autoLock: false,
-        lockTarget: `#${containerId}`,
-    });
 
     return (
         <PageOrchestratorContext.Provider value={state}>
-            <ScrollLockContext.Provider value={scrollLockProvider}>
-                <Container id={'scrollable'}>
+            <ScrollLockContext.Provider value={state}>
+                <Container ref={state.scrollContainerRef}>
                     <ShouldRender condition={state.isStarted} fallback={StartPage}>
                         {
                             pageOrder.map((pageId) => (<Page pageId={pageId}/>))
                         }
-                        <End/>
-                        <NavigationButtons/>
+                        {/*<NavigationButtons/>*/}
                     </ShouldRender>
                 </Container>
+                {/*<End/>*/}
             </ScrollLockContext.Provider>
         </PageOrchestratorContext.Provider>
     );

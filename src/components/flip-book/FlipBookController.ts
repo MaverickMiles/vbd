@@ -16,6 +16,7 @@ interface PageFlipState {
 class FlipBookController implements IEventProps {
     pageNumber: number = 0;
     ref: RefObject<PageFlipState> = createRef();
+    fromSlider = false;
 
     constructor() {
         makeAutoObservable(this, {ref: false}, {autoBind: true});
@@ -43,12 +44,17 @@ class FlipBookController implements IEventProps {
         if (!flipBookState) return;
         const target = evt.target.value;
         console.log({target});
+        this.setPageNumber(target, true);
         // account for double page on slide
         flipBookState.pageFlip().flip(target, 'bottom');
     }
 
     onFlip = (flipEvent: any) => {
         console.log('onFlip', {flipEvent});
+        if (this.fromSlider) {
+            this.fromSlider = false;
+            return;
+        }
         this.updatePageNumber();
     }
 
@@ -73,8 +79,14 @@ class FlipBookController implements IEventProps {
         if (!this.ref.current) return;
         console.log({result: this.ref.current});
         const result = this.ref.current;
-        this.pageNumber = result.pageFlip().getCurrentPageIndex();
-        console.log(this.pageNumber);
+        const newPageNumber = result.pageFlip().getCurrentPageIndex();
+        console.log({newPageNumber});
+        this.setPageNumber(newPageNumber);
+    }
+
+    setPageNumber(pageNumber: number, fromSlider: boolean = false) {
+        this.pageNumber = pageNumber;
+        this.fromSlider = fromSlider;
     }
 }
 

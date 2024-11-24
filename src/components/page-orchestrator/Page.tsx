@@ -8,7 +8,6 @@ import {PageOrchestratorContext} from "../../contexts/page-orchestrator-context"
 const PageContainer = styled.div`
   height: 100%;
   width: 100%;
-  overflow: hidden;
   position: relative;
 `;
 

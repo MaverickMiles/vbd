@@ -4,7 +4,11 @@ import HTMLFlipBook from "react-pageflip";
 import {observer, useLocalObservable} from "mobx-react";
 import {FlipBookController} from "./FlipBookController";
 import {pages, pageViewMap} from "../../metadata/book.metadata";
-import {Slider} from "@mui/material";
+import {Slider, Tooltip} from "@mui/material";
+
+import "../../styles/slider.css";
+import { motion } from 'framer-motion';
+
 
 const PageContainer = styled.div<{ direction: 'left' | 'right' }>`
   //background: rgba(42, 42, 42, 0.8);
@@ -12,10 +16,10 @@ const PageContainer = styled.div<{ direction: 'left' | 'right' }>`
 
   ${({direction}) => direction === 'right' ? `
     border-right: 0;
-    box-shadow: inset -7px 0 30px -7px rgba(0, 0, 0, 1);
+    box-shadow: inset 7px 0 30px -7px rgba(0, 0, 0, 1);
   ` : `
     border-left: 0;
-    box-shadow: inset 7px 0 30px -7px rgba(0, 0, 0, 1);
+    box-shadow: inset -7px 0 30px -7px rgba(0, 0, 0, 1);
     border-left: 2px solid rgba(42, 42, 42, 0.8);
   `}
 `;
@@ -50,6 +54,7 @@ const SliderContainer = styled.div`
   bottom: 20px;
   width: 80%;
   max-width: 900px;
+  padding: 10px;
 `;
 
 const useAutoCenter = (controller: FlipBookController) => {
@@ -61,51 +66,84 @@ const useAutoCenter = (controller: FlipBookController) => {
 
 const numOfPages = 10;
 
+interface Props {
+    controller: FlipBookController;
+}
+
+const Flipper = observer((props: Props) => {
+    const {controller} = props;
+    const {isCover, sliderMarks, pageNumber, numOfPages, onSliderChange} = controller;
+
+    return (
+        //     @ts-ignore
+        <HTMLFlipBook width={width}
+                      height={height}
+                      ref={controller.ref}
+                      minHeight={height} minWidth={width} maxHeight={height} maxWidth={width}
+                      drawShadow={false}
+                      maxShadowOpacity={0.5}
+                      showCover={true} showPageCorners={true} size={'stretch'}
+                      onFlip={controller.onFlip}
+                      onUpdate={controller.onUpdate}
+                      onChangeState={controller.onChangeState}
+        >
+            {
+                pages.map((page, index) => {
+                    const PageView = pageViewMap[page.type];
+                    const props = "props" in page ? page.props : {};
+                    return (
+                        <PageContainer direction={index % 2 === 0 ? 'left' : 'right'}>
+                            <PageView {...props} />
+                        </PageContainer>
+                    );
+                })
+            }
+        </HTMLFlipBook>
+    );
+});
+
 const FlipBook = observer(() => {
     const controller = useLocalObservable(() => new FlipBookController());
     const ref = useRef<HTMLDivElement>(null);
     const {isCover, sliderMarks, pageNumber, numOfPages, onSliderChange} = controller;
     const sliderSteps = 1 + 1 + (numOfPages - 2) / 2;
-    const currentSlideStep = pageNumber === 0 ? 0 : pageNumber === numOfPages - 1 ? sliderSteps-1 :
-        (pageNumber % 2 === 1 ? pageNumber+1 : pageNumber)/2;
+    const currentSlideStep = pageNumber === 0 ? 0 : pageNumber === numOfPages - 1 ? sliderSteps - 1 :
+        (pageNumber % 2 === 1 ? pageNumber + 1 : pageNumber) / 2;
 
+    useEffect(() => {
+
+    }, [pageNumber])
     return (
-        <Container>
-            <FlipBookContainer ref={ref} autoCenter={isCover} isStart={pageNumber === 0}>
-                {/*// @ts-ignore*/}
-                <HTMLFlipBook width={width}
-                              height={height}
-                              ref={controller.ref}
-                              minHeight={height} minWidth={width} maxHeight={height} maxWidth={width}
-                              drawShadow={false}
-                              maxShadowOpacity={0.5}
-                              showCover={true} showPageCorners={true} size={'stretch'}
-                              onFlip={controller.onFlip}
-                              onUpdate={controller.onUpdate}
-                              onChangeState={controller.onChangeState}
-                >
-                    {
-                        pages.map((page, index) => {
-                            const PageView = pageViewMap[page.type];
-                            const props = "props" in page ? page.props : {};
-                            return (
-                                <PageContainer direction={index % 2 === 0 ? 'left' : 'right'}>
-                                    <PageView {...props} />
-                                </PageContainer>
-                            );
-                        })
-                    }
-                </HTMLFlipBook>
-            </FlipBookContainer>
-            <SliderContainer>
+        <>
+            <motion.div initial={{opacity: 0}} animate={{opacity: 1}} transition={{duration: 4, easing: 'linear'}}>
+                <FlipBookContainer ref={ref} autoCenter={isCover} isStart={pageNumber === 0}>
+                    <Flipper controller={controller}/>
+                </FlipBookContainer>
+                <SliderContainer>
+                    <Tooltip title={'Drag Slider to desired location'} slotProps={{
+                        popper: {
+                            modifiers: [
+                                {
+                                    name: 'offset',
+                                    options: {
+                                        offset: [0, -14],
+                                    },
+                                },
+                            ],
+                        },
+                    }}>
+                <span>
                 <Slider
-                    defaultValue={currentSlideStep}
-                    value={currentSlideStep}
-                    max={sliderSteps-1}
+                    defaultValue={pageNumber}
+                    value={pageNumber}
+                    max={numOfPages - 1}
                     onChange={onSliderChange}
                 />
-            </SliderContainer>
-        </Container>
+                    </span>
+                    </Tooltip>
+                </SliderContainer>
+            </motion.div>
+        </>
     );
 });
 
