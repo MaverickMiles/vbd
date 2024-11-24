@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #000;
+      font-family: Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .text {
+      font-size: 120px;
+      font-weight: bold;
+      color: #e62b1e;
+      position: relative;
+      opacity: 0;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #e62b1e;
+      border-radius: 50%;
+      pointer-events: none;
+      will-change: transform, opacity;
+    }
+
+    @keyframes particleIn {
+      0% {
+        opacity: 0;
+        transform: translate(var(--startX), var(--startY));
+      }
+      60% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 1;
+        transform: translate(var(--endX), var(--endY));
+      }
+    }
+
+    @keyframes particleOut {
+      0% {
+        opacity: 1;
+        transform: translate(var(--endX), var(--endY));
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--finalX), var(--finalY));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="text">TED</div>
+  </div>
+
+  <script>
+    const text = document.querySelector('.text');
+    const container = document.querySelector('.container');
+    
+    function createParticlePoints() {
+      // Make text temporarily visible for measurement
+      text.style.opacity = '1';
+      const rect = text.getBoundingClientRect();
+      const points = [];
+      const spacing = 3; // Reduced spacing for more particles
+      
+      // Create temporary canvas to sample text pixels
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      
+      // Draw text on canvas
+      ctx.font = getComputedStyle(text).font;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText('TED', 0, rect.height * 0.8); // Adjust baseline
+      
+      // Sample points
+      for (let y = 0; y < rect.height; y += spacing) {
+        for (let x = 0; x < rect.width; x += spacing) {
+          const alpha = ctx.getImageData(x, y, 1, 1).data[3];
+          if (alpha > 0) {
+            points.push({
+              x: rect.left + x,
+              y: rect.top + y
+            });
+          }
+        }
+      }
+      
+      // Hide text again
+      text.style.opacity = '0';
+      return points;
+    }
+
+    function animateParticles() {
+      const points = createParticlePoints();
+      const containerRect = container.getBoundingClientRect();
+      
+      points.forEach((point, i) => {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Calculate positions relative to container
+        const endX = point.x - containerRect.left;
+        const endY = point.y - containerRect.top;
+        
+        // Random start position from edges
+        const startPos = Math.random() < 0.5 ? -100 : containerRect.width + 100;
+        const startX = Math.random() < 0.5 ? startPos : Math.random() * containerRect.width;
+        const startY = startX === startPos ? Math.random() * containerRect.height : 
+                      Math.random() < 0.5 ? -100 : containerRect.height + 100;
+        
+        // Random end position for dispersal
+        const angle = Math.random() * Math.PI * 2;
+        const distance = Math.random() * 300 + 300;
+        const finalX = endX + Math.cos(angle) * distance;
+        const finalY = endY + Math.sin(angle) * distance;
+        
+        // Set initial position
+        particle.style.left = '0';
+        particle.style.top = '0';
+        
+        // Set animation variables
+        particle.style.setProperty('--startX', `${startX}px`);
+        particle.style.setProperty('--startY', `${startY}px`);
+        particle.style.setProperty('--endX', `${endX}px`);
+        particle.style.setProperty('--endY', `${endY}px`);
+        particle.style.setProperty('--finalX', `${finalX}px`);
+        particle.style.setProperty('--finalY', `${finalY}px`);
+        
+        container.appendChild(particle);
+        
+        // Trigger animations with delays
+        requestAnimationFrame(() => {
+          // Move to letter formation
+          particle.style.animation = `particleIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) ${Math.random() * 0.4}s forwards`;
+          
+          // Disperse particles
+          setTimeout(() => {
+            particle.style.animation = `particleOut 1s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards`;
+            
+            // Clean up particle
+            setTimeout(() => particle.remove(), 1000);
+          }, 2500);
+        });
+      });
+      
+      // Restart animation after completion
+      // setTimeout(() => {
+      //   container.innerHTML = '<div class="text">TED</div>';
+      //   setTimeout(animateParticles, 500);
+      // }, 4000);
+    }
+
+    // Start the animation
+    animateParticles();
+  </script>
+</body>
+</html>

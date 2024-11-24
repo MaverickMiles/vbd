@@ -10,6 +10,26 @@ import {AllPages, Author, PageType} from "../models/book.model";
 import {FunctionComponent} from "react";
 import {FrontBookCover} from "../components/flip-book/FrontBookCover";
 import {BackCover} from "../components/flip-book/BackCover";
+import damon from '../assets/photos/damon.png';
+import eric from '../assets/photos/eric.png';
+import spider from '../assets/photos/spider.png';
+import achie_bday_photo from '../assets/photos/v-achie-bday-photo.png';
+import achie_impact from '../assets/photos/v-achie-impact.png';
+import hanna_bday_photo from '../assets/photos/v-hanna-bday-photo.png';
+import hermi_bday_photo from '../assets/photos/v-hermi-bday-photo.png';
+import hermi_impact from '../assets/photos/v-hermi-impact.png';
+import kaleb_impact from '../assets/photos/v-kaleb-impact.png';
+import milo_bday_photo from '../assets/photos/v-milo-bday-photo.png';
+import nicole_bday_photo from '../assets/photos/v-nicole-bday-photo.png';
+import nicole_impact from '../assets/photos/v-nicole-impact.png';
+import rediet_bday_photo from '../assets/photos/v-rediet-bday-photo.png';
+import rediet_impact from '../assets/photos/v-rediet-impact.png';
+import rediet_memory from '../assets/photos/v-rediet-memory.png';
+import VM269 from '../assets/photos/VM269.png';
+import VM270 from '../assets/photos/VM270.png';
+import VM271 from '../assets/photos/VM271.png';
+import VM272 from '../assets/photos/VM272.png';
+
 
 const authors: Author[] = [
     {
@@ -77,26 +97,25 @@ const sections = {
 }
 
 const photos = {
-    redietMemorySection: '/photos/v-rediet-memory.png',
-    nicoleImpactSection: '/photos/v-nicole-impact.png',
-    redietImpactSection: '/photos/v-rediet-impact.png',
-    kalebImpactSection: '/photos/v-kaleb-impact.png',
-    achieImpactSection: '/photos/v-achie-impact.png',
-    hermiImpactSection: '/photos/v-hermi-impact.png',
-    miloBirthdayPhoto: '/photos/v-milo-bday-photo.png',
-    hermiBirthdayPhoto: '/photos/v-hermi-bday-photo.png',
-    redietBirthdayPhoto: '/photos/v-rediet-bday-photo.png',
-    achieBirthdayPhoto: '/photos/v-achie-bday-photo.png',
-    nicoleBirthdayPhoto: '/photos/v-nicole-bday-photo.png',
-    hannaBirthdayPhoto: '/photos/v-hanna-bday-photo.png',
-    ericBirthdayPhoto: '/photos/eric.png',
-    spiderBirthdayPhoto: '/photos/spider.png',
-    VM269BirthdayPhoto: '/photos/VM269.png',
-    VM270BirthdayPhoto: '/photos/VM270.png',
-    VM271BirthdayPhoto: '/photos/VM271.png',
-    VM272BirthdayPhoto: '/photos/VM272.png',
-    backCoverPhoto: '/photos/back-cover.svg',
-    damon: '/photos/damon.png',
+    redietMemorySection: rediet_memory,
+    nicoleImpactSection: nicole_impact,
+    redietImpactSection: rediet_impact,
+    kalebImpactSection: kaleb_impact,
+    achieImpactSection: achie_impact,
+    hermiImpactSection: hermi_impact,
+    miloBirthdayPhoto: milo_bday_photo,
+    hermiBirthdayPhoto: hermi_bday_photo,
+    redietBirthdayPhoto: rediet_bday_photo,
+    achieBirthdayPhoto: achie_bday_photo,
+    nicoleBirthdayPhoto: nicole_bday_photo,
+    hannaBirthdayPhoto: hanna_bday_photo,
+    ericBirthdayPhoto: eric,
+    spiderBirthdayPhoto: spider,
+    VM269BirthdayPhoto: VM269,
+    VM270BirthdayPhoto: VM270,
+    VM271BirthdayPhoto: VM271,
+    VM272BirthdayPhoto: VM272,
+    damon: damon,
 }
 
 const prompts = {

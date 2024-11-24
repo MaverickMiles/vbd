@@ -5,14 +5,13 @@ import ShouldRender from "../ShouldRender";
 import {IconButton} from "@mui/material";
 import React, {useEffect, useState} from "react";
 import {TadpoleAnimationController} from "./TadpoleAnimationController";
+const audioUrl = require('../../assets/audio/at-your-best.mp3');
 
 const Container = styled.div`
   color: white;
   position: fixed;
   top: 75px;
 `;
-
-const audioUrl = `/at-your-best.mp3`;
 
 interface Props {
     controller: TadpoleAnimationController;

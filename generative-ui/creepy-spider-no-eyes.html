@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: white;
+    }
+
+    .spider {
+      position: absolute;
+      top: 50%;
+      left: -200px;
+      width: 140px;
+      height: 120px;
+      transform: translateY(-50%);
+      animation: walkIn 6s linear forwards;
+    }
+
+    .body {
+      position: absolute;
+      width: 70px;
+      height: 90px;
+      background: linear-gradient(145deg, #000, #1a1a1a, #000);
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      top: 15px;
+      left: 35px;
+      box-shadow: inset 0 0 10px rgba(100,100,100,0.5);
+    }
+
+    .head {
+      position: absolute;
+      width: 45px;
+      height: 40px;
+      background: linear-gradient(145deg, #000, #1a1a1a, #000);
+      border-radius: 45% 45% 45% 45% / 60% 60% 40% 40%;
+      top: 5px;
+      left: 45px;
+      box-shadow: inset 0 0 10px rgba(100,100,100,0.5);
+    }
+
+    .leg {
+      position: absolute;
+      height: 3px;
+      background: linear-gradient(to right, #000, #1a1a1a);
+      transform-origin: 0 50%;
+    }
+
+    .leg::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: inherit;
+      transform-origin: inherit;
+      filter: blur(0.5px);
+    }
+
+    .leg-segment {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      transform-origin: 0 50%;
+    }
+
+    .leg.left {
+      left: 40px;
+      width: 90px;
+    }
+
+    .leg.right {
+      right: -50px;
+      width: 90px;
+      transform-origin: 100% 50%;
+    }
+
+    .leg:nth-child(1) { top: 25px; }
+    .leg:nth-child(2) { top: 45px; }
+    .leg:nth-child(3) { top: 65px; }
+    .leg:nth-child(4) { top: 85px; }
+
+    .leg.left:nth-child(1) { animation: legWaveLeft 0.6s infinite ease-in-out; }
+    .leg.left:nth-child(2) { animation: legWaveLeft 0.6s infinite ease-in-out 0.15s; }
+    .leg.left:nth-child(3) { animation: legWaveLeft 0.6s infinite ease-in-out 0.3s; }
+    .leg.left:nth-child(4) { animation: legWaveLeft 0.6s infinite ease-in-out 0.45s; }
+
+    .leg.right:nth-child(5) { animation: legWaveRight 0.6s infinite ease-in-out 0.15s; }
+    .leg.right:nth-child(6) { animation: legWaveRight 0.6s infinite ease-in-out 0.3s; }
+    .leg.right:nth-child(7) { animation: legWaveRight 0.6s infinite ease-in-out 0.45s; }
+    .leg.right:nth-child(8) { animation: legWaveRight 0.6s infinite ease-in-out 0.6s; }
+
+    @keyframes walkIn {
+      0% {
+        left: -200px;
+        transform: translateY(-50%) scale(1);
+      }
+      70% {
+        left: 50%;
+        transform: translateY(-50%) translateX(-50%) scale(1);
+      }
+      100% {
+        left: 50%;
+        transform: translateY(-50%) translateX(-50%) scale(50);
+      }
+    }
+
+    @keyframes legWaveLeft {
+      0%, 100% { transform: rotate(-30deg); }
+      50% { transform: rotate(10deg); }
+    }
+
+    @keyframes legWaveRight {
+      0%, 100% { transform: rotate(30deg); }
+      50% { transform: rotate(-10deg); }
+    }
+
+    .hair {
+      position: absolute;
+      width: 1px;
+      height: 4px;
+      background: #111;
+      transform-origin: bottom center;
+    }
+
+    .shadow {
+      position: absolute;
+      width: 100px;
+      height: 20px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 50%;
+      bottom: -25px;
+      left: 20px;
+      filter: blur(8px);
+      transform-origin: center;
+      animation: shadowMove 0.6s infinite ease-in-out;
+    }
+
+    @keyframes shadowMove {
+      0%, 100% { transform: scaleX(1); }
+      50% { transform: scaleX(0.8); }
+    }
+
+    .shine {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, transparent 45%, rgba(255,255,255,0.1) 50%, transparent 55%);
+      mix-blend-mode: overlay;
+    }
+  </style>
+</head>
+<body>
+  <div class="spider">
+    <div class="shadow"></div>
+    <div class="leg left"><div class="leg-segment"></div></div>
+    <div class="leg left"><div class="leg-segment"></div></div>
+    <div class="leg left"><div class="leg-segment"></div></div>
+    <div class="leg left"><div class="leg-segment"></div></div>
+    <div class="leg right"><div class="leg-segment"></div></div>
+    <div class="leg right"><div class="leg-segment"></div></div>
+    <div class="leg right"><div class="leg-segment"></div></div>
+    <div class="leg right"><div class="leg-segment"></div></div>
+    <div class="body">
+      <div class="shine"></div>
+    </div>
+    <div class="head">
+      <div class="shine"></div>
+    </div>
+  </div>
+
+  <script>
+    // Add random hairs to both body and legs
+    const spider = document.querySelector('.spider');
+    const body = document.querySelector('.body');
+    const legs = document.querySelectorAll('.leg');
+    
+    function addHairs(element, count, maxLength) {
+      for(let i = 0; i < count; i++) {
+        const hair = document.createElement('div');
+        hair.className = 'hair';
+        hair.style.left = Math.random() * 100 + '%';
+        hair.style.top = Math.random() * 100 + '%';
+        hair.style.height = (Math.random() * maxLength + 2) + 'px';
+        hair.style.transform = `rotate(${Math.random() * 360}deg)`;
+        element.appendChild(hair);
+      }
+    }
+
+    addHairs(body, 40, 4);
+    legs.forEach(leg => addHairs(leg, 15, 3));
+  </script>
+</body>
+</html>

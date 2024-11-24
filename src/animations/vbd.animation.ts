@@ -126,7 +126,7 @@ class Animator {
         ctx.fillStyle = '#ffffff';
         ctx.fillText(textNode.innerText, 0, rect.height * 0.8);
         const imageData = ctx.getImageData(0, 0, rect.width, rect.height);
-        // console.log(imageData.data);
+        // // console.log(imageData.data);
         // let counter = 0;
         // let stepper = 3;
 
@@ -146,7 +146,7 @@ class Animator {
 
     disintegrate = (text: HTMLElement, container: HTMLElement,) => {
         const particlePoints = this.createParticlePoints(text);
-        console.log({particlePoints: particlePoints.length});
+        // console.log({particlePoints: particlePoints.length});
         particlePoints.forEach((point, i) => {
             const particle = this.createParticleElement(text, point);
             document.body.appendChild(particle);
@@ -163,7 +163,7 @@ class Animator {
                     if (!this.lock) {
                         this.lock = true;
                         if (this.textRef.current) {
-                            console.log(this.textRef.current);
+                            // console.log(this.textRef.current);
                             this.textRef.current.style.backgroundColor = 'black';
                         }
                     }
@@ -197,7 +197,7 @@ class Animator {
         letters.forEach((letter, index) => {
             const time = Date.now();
             this.disintegrate(letter, text);
-            console.log(`Time spent creating particles for ${letter.innerText}`, Date.now().valueOf() - time.valueOf());
+            // console.log(`Time spent creating particles for ${letter.innerText}`, Date.now().valueOf() - time.valueOf());
             // letter.style.color = 'white';
             letter.style.opacity = '0';
             // letter.style.textShadow = 'none';

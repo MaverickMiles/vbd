@@ -144,7 +144,7 @@ class TadpoleAnimationController {
         }, {autoBind: true});
         this.tadpoleTarget = new TadpoleTargetController(this);
         autorun(() => {
-            console.log("Transition State", this.transitionState);
+            // console.log("Transition State", this.transitionState);
         });
     }
 
@@ -196,13 +196,13 @@ class TadpoleAnimationController {
     }
 
     animate = () => {
-        // console.log("IS ANIMATING");
+        // // console.log("IS ANIMATING");
         const {isAnimating, canvasContext, canvas} = this;
         invariant(canvas);
         invariant(canvasContext);
         const {width, height} = canvas;
         if (!isAnimating) {
-            console.log("IS NOT ANIMATING");
+            // console.log("IS NOT ANIMATING");
             this.start();
             return;
         }
@@ -210,7 +210,7 @@ class TadpoleAnimationController {
         canvasContext.clearRect(0, 0, width, height);
         this.updateTadpoleCount();
 
-        // console.log({activeTadpoles: this.activeTadpoleCount});
+        // // console.log({activeTadpoles: this.activeTadpoleCount});
 
         this.tadpoles.forEach(tadpole => {
             tadpole.update();

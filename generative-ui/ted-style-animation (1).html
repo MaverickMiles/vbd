@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #000;
+      font-family: Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .text {
+      font-size: 120px;
+      font-weight: bold;
+      color: #e62b1e;
+      opacity: 1;
+      cursor: pointer;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: #e62b1e;
+      border-radius: 50%;
+      pointer-events: none;
+      will-change: transform, opacity;
+    }
+
+    @keyframes particleDisintegrate {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) rotate(var(--rot));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="text">TED</div>
+  </div>
+
+  <script>
+    const text = document.querySelector('.text');
+    const container = document.querySelector('.container');
+    
+    function createParticlePoints() {
+      const rect = text.getBoundingClientRect();
+      const points = [];
+      const spacing = 6; // Small spacing for dense particles
+      
+      // Create temporary canvas to sample text pixels
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      
+      // Draw text on canvas
+      ctx.font = getComputedStyle(text).font;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText('TED', 0, rect.height * 0.8); // Adjust baseline
+      
+      // Sample points where text exists
+      for (let y = 0; y < rect.height; y += spacing) {
+        for (let x = 0; x < rect.width; x += spacing) {
+          const alpha = ctx.getImageData(x, y, 1, 1).data[3];
+          if (alpha > 0) {
+            points.push({
+              x: x,
+              y: y
+            });
+          }
+        }
+      }
+      
+      return { points, rect };
+    }
+
+    function disintegrate() {
+      const { points, rect } = createParticlePoints();
+      
+      // Create particles at each point
+      points.forEach((point, i) => {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Position particle at its starting point
+        particle.style.left = `${rect.left + point.x}px`;
+        particle.style.top = `${rect.top + point.y}px`;
+        
+        // Calculate random movement
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = Math.random() * 200 + 100;
+        const tx = Math.cos(angle) * velocity;
+        const ty = Math.sin(angle) * velocity;
+        const rotation = (Math.random() - 0.5) * 720;
+        
+        // Set animation variables
+        particle.style.setProperty('--tx', `${tx}px`);
+        particle.style.setProperty('--ty', `${ty}px`);
+        particle.style.setProperty('--rot', `${rotation}deg`);
+        
+        // Add particle to document
+        document.body.appendChild(particle);
+        
+        // Trigger animation with slight delay based on position
+        const delay = Math.random() * 0.3;
+        requestAnimationFrame(() => {
+          particle.style.animation = `particleDisintegrate 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) ${delay}s forwards`;
+        });
+        
+        // Remove particle after animation
+        setTimeout(() => {
+          particle.remove();
+        }, (1 + delay) * 1000);
+      });
+      
+      // Hide original text
+      text.style.opacity = '0';
+      text.style.transition = 'opacity 0.3s';
+      
+      // Reset after animation
+      setTimeout(() => {
+        text.style.opacity = '1';
+      }, 2000);
+    }
+
+    // Add click handler
+    text.addEventListener('click', () => {
+      if (text.style.opacity !== '0') {
+        disintegrate();
+      }
+    });
+
+    // Auto-trigger first animation after a delay
+    setTimeout(disintegrate, 1000);
+  </script>
+</body>
+</html>

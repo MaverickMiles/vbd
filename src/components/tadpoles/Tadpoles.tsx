@@ -186,9 +186,9 @@ const Tadpoles = observer((props: Props) => {
     }, []);
 
     useEffect(() => {
-        console.log({EOF: controller.EOF});
+        // console.log({EOF: controller.EOF});
         if (controller.EOF) {
-            console.log("Calling unlock");
+            // console.log("Calling unlock");
             unlock();
         } else {
             lock();
@@ -203,7 +203,7 @@ const Tadpoles = observer((props: Props) => {
 
     const onEggLightClick = () => {
         // if (!isTransitioning) return;
-        // console.log('Ready for Transition');
+        // // console.log('Ready for Transition');
         // setShowAvatar(true);
     }
 

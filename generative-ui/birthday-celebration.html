@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      overflow-x: hidden;
+    }
+
+    .section {
+      height: 100vh;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: sticky;
+      top: 0;
+    }
+
+    .content {
+      text-align: center;
+      padding: 20px;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .name-container, .date-container, .message-container {
+      opacity: 0;
+      transform: translateY(50px);
+    }
+
+    .name {
+      font-size: 4vw;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(45deg, #fff, #e0e0e0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .date {
+      font-size: 8vw;
+      font-weight: 800;
+      margin: 20px 0;
+      background: linear-gradient(45deg, #FFD700, #FFA500);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .message {
+      font-size: 1.5vw;
+      color: #888;
+      letter-spacing: 0.1em;
+    }
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    .particle {
+      position: absolute;
+      background: #fff;
+      border-radius: 50%;
+    }
+
+    .scroll-indicator {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #fff;
+      font-size: 14px;
+      opacity: 0.6;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateX(-50%) translateY(0);
+      }
+      40% {
+        transform: translateX(-50%) translateY(-10px);
+      }
+      60% {
+        transform: translateX(-50%) translateY(-5px);
+      }
+    }
+
+    .parallax-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+      opacity: 0.5;
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="parallax-bg"></div>
+  <div class="particles"></div>
+  
+  <div class="container">
+    <div class="section" id="intro">
+      <div class="content">
+        <div class="name-container">
+          <h1 class="name">Veronica Tassew Woldehanna</h1>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="date">
+      <div class="content">
+        <div class="date-container">
+          <div class="date">11.22.24</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="message">
+      <div class="content">
+        <div class="message-container">
+          <div class="message">A day of celebration.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">Scroll to Reveal</div>
+
+  <script>
+    function createParticles() {
+      const particlesContainer = document.querySelector('.particles');
+      const particleCount = 100;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        const size = Math.random() * 4 + 2;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        
+        const x = Math.random() * 100;
+        const y = Math.random() * 100;
+        particle.style.left = `${x}%`;
+        particle.style.top = `${y}%`;
+        
+        particlesContainer.appendChild(particle);
+        
+        const duration = Math.random() * 2 + 2;
+        const delay = Math.random() * 3;
+        
+        particle.animate([
+          { opacity: 0, transform: 'translateY(0) scale(0)' },
+          { opacity: 0.8, transform: 'translateY(-100px) scale(1)', offset: 0.6 },
+          { opacity: 0, transform: 'translateY(-200px) scale(0)' }
+        ], {
+          duration: duration * 1000,
+          delay: delay * 1000,
+          iterations: Infinity,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+        });
+      }
+    }
+
+    function handleScroll() {
+      const scrollPosition = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollProgress = scrollPosition / (documentHeight - windowHeight);
+
+      // Parallax background effect
+      const parallaxBg = document.querySelector('.parallax-bg');
+      parallaxBg.style.transform = `scale(${1.1 + (scrollProgress * 0.1)})`;
+
+      // Animate name section
+      const nameContainer = document.querySelector('.name-container');
+      const nameOffset = document.getElementById('intro').offsetTop;
+      const nameProgress = Math.max(0, Math.min(1, (scrollPosition - nameOffset + windowHeight) / windowHeight));
+      nameContainer.style.opacity = nameProgress;
+      nameContainer.style.transform = `translateY(${50 * (1 - nameProgress)}px)`;
+
+      // Animate date section
+      const dateContainer = document.querySelector('.date-container');
+      const dateOffset = document.getElementById('date').offsetTop;
+      const dateProgress = Math.max(0, Math.min(1, (scrollPosition - dateOffset + windowHeight) / windowHeight));
+      dateContainer.style.opacity = dateProgress;
+      dateContainer.style.transform = `translateY(${50 * (1 - dateProgress)}px)`;
+
+      // Animate message section
+      const messageContainer = document.querySelector('.message-container');
+      const messageOffset = document.getElementById('message').offsetTop;
+      const messageProgress = Math.max(0, Math.min(1, (scrollPosition - messageOffset + windowHeight) / windowHeight));
+      messageContainer.style.opacity = messageProgress;
+      messageContainer.style.transform = `translateY(${50 * (1 - messageProgress)}px)`;
+
+      // Control particles opacity based on scroll
+      const particles = document.querySelector('.particles');
+      particles.style.opacity = Math.min(1, scrollProgress * 2);
+
+      // Hide scroll indicator after starting to scroll
+      const scrollIndicator = document.querySelector('.scroll-indicator');
+      scrollIndicator.style.opacity = Math.max(0, 0.6 - scrollProgress * 2);
+    }
+
+    window.addEventListener('load', () => {
+      createParticles();
+      handleScroll(); // Initial call to set starting positions
+    });
+
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+  </script>
+</body>
+</html>

@@ -21,7 +21,7 @@ class FlipBookController implements IEventProps {
     constructor() {
         makeAutoObservable(this, {ref: false}, {autoBind: true});
         autorun(() => {
-            console.log({page: this.pageNumber, totalPages: this.numOfPages});
+            // console.log({page: this.pageNumber, totalPages: this.numOfPages});
         });
     }
 
@@ -43,14 +43,14 @@ class FlipBookController implements IEventProps {
         const flipBookState = this.ref.current;
         if (!flipBookState) return;
         const target = evt.target.value;
-        console.log({target});
+        // console.log({target});
         this.setPageNumber(target, true);
         // account for double page on slide
         flipBookState.pageFlip().flip(target, 'bottom');
     }
 
     onFlip = (flipEvent: any) => {
-        console.log('onFlip', {flipEvent});
+        // console.log('onFlip', {flipEvent});
         if (this.fromSlider) {
             this.fromSlider = false;
             return;
@@ -59,28 +59,28 @@ class FlipBookController implements IEventProps {
     }
 
     onChangeOrientation = (flipEvent: any) => {
-        console.log('onChangeOrientation', {flipEvent});
+        // console.log('onChangeOrientation', {flipEvent});
     }
 
     onChangeState = (flipEvent: any) => {
-        console.log('onChangeState', {flipEvent});
+        // console.log('onChangeState', {flipEvent});
         // this.updatePageNumber();
     }
 
     onInit = (flipEvent: any) => {
-        console.log('onInit', {flipEvent})
+        // console.log('onInit', {flipEvent})
     }
 
     onUpdate = (flipEvent: any) => {
-        console.log('onUpdate', {flipEvent})
+        // console.log('onUpdate', {flipEvent})
     }
 
     updatePageNumber() {
         if (!this.ref.current) return;
-        console.log({result: this.ref.current});
+        // console.log({result: this.ref.current});
         const result = this.ref.current;
         const newPageNumber = result.pageFlip().getCurrentPageIndex();
-        console.log({newPageNumber});
+        // console.log({newPageNumber});
         this.setPageNumber(newPageNumber);
     }
 

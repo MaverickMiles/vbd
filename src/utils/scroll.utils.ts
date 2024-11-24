@@ -64,7 +64,7 @@ export function getScrollMetrics(element: HTMLElement): ScrollMetrics {
 // Example usage:
 // const scrollableDiv = document.querySelector('.scrollable-container');
 // const metrics = getScrollMetrics(scrollableDiv);
-// console.log(`Scrolled ${metrics.scrollPercentY.toFixed(1)}% vertically`);
+// // console.log(`Scrolled ${metrics.scrollPercentY.toFixed(1)}% vertically`);
 
 
 export const fadeOnScroll = <T extends HTMLElement>(container: HTMLElement, el: HTMLElement) => {

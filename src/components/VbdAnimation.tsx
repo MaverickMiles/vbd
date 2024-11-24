@@ -3,8 +3,8 @@ import styled from "styled-components";
 import {primaryRed} from "../styles/colors";
 import '../styles/vbd.css';
 import {Animator} from "../animations/vbd.animation";
-import anime from "animejs";
 import {observer, useLocalObservable} from "mobx-react";
+const audioUrl = require('../assets/audio/TED-Intro-Animation.mp3');
 
 const VbdContainer = styled.div`
   background: white;
@@ -29,12 +29,9 @@ const Letter = styled.span`
   transition: opacity 3s ease-in-out;
 `
 
-const audioUrl = '/TED-Intro-Animation.mp3';
-
 interface Props {
     onFinish: () => void;
 }
-
 
 const VbdAnimation = observer((props: Props) => {
     const animator = useLocalObservable(() => new Animator());
@@ -48,7 +45,7 @@ const VbdAnimation = observer((props: Props) => {
 
     useEffect(() => {
         if (animator.isFinished) {
-            console.log("is finished");
+            // console.log("is finished");
             props.onFinish();
         }
     }, [animator.isFinished]);

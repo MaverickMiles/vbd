@@ -15,7 +15,7 @@ const options = {
     // gradients: !$.isTouch,
     // when: {
     //     turned: function (e: any, page: any) {
-    //         console.log("Current view: ", $(this).turn("view"));
+    //         // console.log("Current view: ", $(this).turn("view"));
     //     }
     // }
 };

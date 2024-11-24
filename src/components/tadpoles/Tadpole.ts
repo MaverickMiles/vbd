@@ -160,7 +160,7 @@ class Tadpole {
     }
 
     reset() {
-        console.log("Resetting");
+        // console.log("Resetting");
         // this.points[0].x = this.savedX;
         // this.points[0].y = this.savedY;
         const canvas = this.canvas;
