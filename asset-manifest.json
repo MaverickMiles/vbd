@@ -1,15 +1,36 @@
 {
   "files": {
     "main.css": "/vbd/static/css/main.c62ab1e3.css",
-    "main.js": "/vbd/static/js/main.e69ec0b8.js",
+    "main.js": "/vbd/static/js/main.6e40fb8c.js",
     "static/js/453.a856ff1a.chunk.js": "/vbd/static/js/453.a856ff1a.chunk.js",
+    "static/media/at-your-best.mp3": "/vbd/static/media/at-your-best.10b573f2ed1eb59ca968.mp3",
+    "static/media/v-nicole-impact.png": "/vbd/static/media/v-nicole-impact.a14142c94ec125c95925.png",
+    "static/media/v-hermi-impact.png": "/vbd/static/media/v-hermi-impact.8345b42596d832d1048e.png",
+    "static/media/VM270.png": "/vbd/static/media/VM270.66e6c09d8bce2a5952fc.png",
+    "static/media/v-achie-bday-photo.png": "/vbd/static/media/v-achie-bday-photo.9cb772fd6dc0afcc49cb.png",
+    "static/media/VM272.png": "/vbd/static/media/VM272.60d5aff0b7d3cb5b9352.png",
+    "static/media/v-rediet-impact.png": "/vbd/static/media/v-rediet-impact.3d1c8af639306fa5a436.png",
+    "static/media/v-milo-bday-photo.png": "/vbd/static/media/v-milo-bday-photo.2ebd8d847f2c3d450018.png",
+    "static/media/v-kaleb-impact.png": "/vbd/static/media/v-kaleb-impact.523c8c27d5320e19983a.png",
+    "static/media/v-nicole-bday-photo.png": "/vbd/static/media/v-nicole-bday-photo.35207e358f1c2a1df2e1.png",
+    "static/media/VM269.png": "/vbd/static/media/VM269.4b5b6f07d48c72f9112a.png",
+    "static/media/v-rediet-bday-photo.png": "/vbd/static/media/v-rediet-bday-photo.d0e71410b1eeb529c8bc.png",
+    "static/media/v-hanna-bday-photo.png": "/vbd/static/media/v-hanna-bday-photo.1e2d226b87e72a78e024.png",
+    "static/media/v-achie-impact.png": "/vbd/static/media/v-achie-impact.524c74969f7b0c115777.png",
+    "static/media/eric.png": "/vbd/static/media/eric.f163f53758b63d3408b6.png",
+    "static/media/damon.png": "/vbd/static/media/damon.764b5d3f79450c5b5df5.png",
+    "static/media/v-rediet-memory.png": "/vbd/static/media/v-rediet-memory.17f5806a02bb7a5b9f0b.png",
+    "static/media/VM271.png": "/vbd/static/media/VM271.59d0ebe7a2584b74f2cc.png",
+    "static/media/v-hermi-bday-photo.png": "/vbd/static/media/v-hermi-bday-photo.9e08d7438ad8677afed3.png",
+    "static/media/spider.png": "/vbd/static/media/spider.cf1b37de860f4b979cc1.png",
+    "static/media/TED-Intro-Animation.mp3": "/vbd/static/media/TED-Intro-Animation.19010e799c073c5eae0c.mp3",
     "index.html": "/vbd/index.html",
     "main.c62ab1e3.css.map": "/vbd/static/css/main.c62ab1e3.css.map",
-    "main.e69ec0b8.js.map": "/vbd/static/js/main.e69ec0b8.js.map",
+    "main.6e40fb8c.js.map": "/vbd/static/js/main.6e40fb8c.js.map",
     "453.a856ff1a.chunk.js.map": "/vbd/static/js/453.a856ff1a.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.c62ab1e3.css",
-    "static/js/main.e69ec0b8.js"
+    "static/js/main.6e40fb8c.js"
   ]
 }
